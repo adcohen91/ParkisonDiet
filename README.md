@@ -5,20 +5,21 @@ Below is an example of a diet plan and grocery list for a person who has Parkins
 An Exmaple Menu starts at # Example Menu
 1) Create an application that will be deployed on AWS
 2) Prompt the user for a start date and and date. Show them a calendar that they can select from. If they chose more than 31 days it will be too many days and the system will tell them to keep the selection to 31 days or less.
-2) Ask the user if they have any allergies and provide a list of common ingredients that a person might be allergic to, for example dairy, nuts.
-3) The user will select from this items which ones they are allergic to and should not be included in a recipe.
-4) Provide a list of meats to exclude from their diet, for example: fish, poultry, beef, pork, goat. Ask them if they are vegan.
-5) The user will indicate from the list what they do not eat if they are not vegan.
-6) Ask the user how much money they have to spend.
-7) Compile all this information and create the meals for the time selected. A recipe and the ingredients listed.
-9) Create a shopping list for all the items for the user.
-10) Ask for the users email.
-11) If they enter an email send them the information in a format similar what in the screen.
-12) All system information can be found in the .env file
-13) An example html file to serve as a final result is located in meal-plan.html file
-14) Additional build inforaation is contained in the file <!DOCTYPE.txt
-15) After the build is complete test each component
-16) Push the application to AWS
+3) Ask the user if they have any allergies and provide a list of common ingredients that a person might be allergic to, for example dairy, nuts.
+4) The user will select from this items which ones they are allergic to and should not be included in a recipe.
+5) Provide a list of meats to exclude from their diet, for example: fish, poultry, beef, pork, goat. Ask them if they are vegan.
+6) The user will indicate from the list what they do not eat if they are not vegan.
+7) Ask the user how much money they have to spend.
+8) Compile all this information and find recepies on the internet that satisfy all criteria
+9)  A recipe and the ingredients listed.
+10) Create a shopping list for all the items for the user.
+11) Ask for the users email.
+12) If they enter an email send them the information in a format similar what in the screen.
+13) All system information can be found in the .env file
+14) An example html file to serve as a final result is located in meal-plan.html file
+15) Additional build inforaation is contained in the file <!DOCTYPE.txt
+16) After the build is complete test each component
+17) Push the application to AWS
 
 # Example Menu
 
