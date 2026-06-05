@@ -2,7 +2,7 @@
 This is the code repository for the Parkinson's Diet application.
 
 Below is an example of a diet plan and grocery list for a person who has Parkinson's disease.
-
+An Exmaple Menu starts at # Example Menu
 1) Create an application that will be deployed on AWS
 2) Prompt the user for a start date and and date. Show them a calendar that they can select from. If they chose more than 31 days it will be too many days and the system will tell them to keep the selection to 31 days or less.
 2) Ask the user if they have any allergies and provide a list of common ingredients that a person might be allergic to, for example dairy, nuts.
@@ -15,6 +15,8 @@ Below is an example of a diet plan and grocery list for a person who has Parkins
 10) Ask for the users email.
 11) If they enter an email send them the information in a format similar what in the screen.
 12) All system information can be found in the .env file
+13) An example html file to serve as a final result is located in meal-plan.html file
+14) Additional build inforaation is contained in the file <!DOCTYPE.txt
 
 # Example Menu
 
