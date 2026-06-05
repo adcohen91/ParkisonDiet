@@ -14,6 +14,7 @@ Below is an example of a diet plan and grocery list for a person who has Parkins
 9) Create a shopping list for all the items for the user.
 10) Ask for the users email.
 11) If they enter an email send them the information in a format similar what in the screen.
+12) All system information can be found in the .env file
 
 # Example Menu
 
