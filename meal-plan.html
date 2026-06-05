@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your June Meal Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage: #7a9e7e;
+    --sage-light: #b5cdb7;
+    --sage-dark: #4a6b4e;
+    --cream: #faf7f2;
+    --warm: #f0e8d5;
+    --text: #2a2a2a;
+    --muted: #6b6b6b;
+    --accent: #c4713b;
+    --accent-light: #f2dcc8;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 60%, var(--sage-light) 100%);
+    color: white;
+    padding: 48px 32px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  header p {
+    font-size: 1rem;
+    opacity: 0.85;
+    font-weight: 300;
+    position: relative;
+  }
+  .badges {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .badge {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  nav {
+    background: var(--white);
+    border-bottom: 2px solid var(--warm);
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    padding: 14px 24px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+  .nav-btn:hover { color: var(--sage-dark); }
+  .nav-btn.active { color: var(--sage-dark); border-bottom-color: var(--sage); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* WEEK TABS */
+  .week-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .week-tab {
+    background: var(--white);
+    border: 2px solid var(--sage-light);
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--sage-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .week-tab:hover, .week-tab.active {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+
+  .week-grid { display: none; }
+  .week-grid.active { display: block; }
+
+  .day-card {
+    background: var(--white);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    border: 1px solid #ede9e0;
+  }
+  .day-header {
+    background: linear-gradient(90deg, var(--sage-dark), var(--sage));
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .day-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 36px;
+  }
+  .day-name {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+  .meals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .meal {
+    padding: 16px 20px;
+    border-right: 1px solid #ede9e0;
+  }
+  .meal:last-child { border-right: none; }
+  .meal-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .meal-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--sage-dark);
+    margin-bottom: 6px;
+  }
+  .meal-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .meal-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .tag {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .tag.green {
+    background: #e3f0e4;
+    color: var(--sage-dark);
+  }
+
+  /* RECIPES */
+  .recipe-search {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--sage-light);
+    border-radius: 10px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 24px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--white);
+  }
+  .recipe-search:focus { border-color: var(--sage); }
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .recipe-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #ede9e0;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .recipe-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: var(--sage-light);
+  }
+  .recipe-type {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .recipe-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--sage-dark);
+    margin-bottom: 8px;
+  }
+  .recipe-summary {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 32px 16px;
+  }
+  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    padding: 32px;
+    position: relative;
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: var(--warm);
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--sage-dark);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  .modal-meta {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--warm);
+  }
+  .modal h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+    margin-top: 18px;
+  }
+  .ingredients-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .ingredients-list li {
+    font-size: 0.88rem;
+    padding: 4px 0;
+    color: var(--text);
+    display: flex;
+    gap: 6px;
+  }
+  .ingredients-list li::before {
+    content: '•';
+    color: var(--sage);
+    font-weight: bold;
+  }
+  .steps-list {
+    list-style: none;
+    counter-reset: steps;
+  }
+  .steps-list li {
+    counter-increment: steps;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    padding: 8px 0 8px 32px;
+    position: relative;
+    border-bottom: 1px solid var(--warm);
+    color: var(--text);
+  }
+  .steps-list li:last-child { border-bottom: none; }
+  .steps-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 0;
+    top: 8px;
+    background: var(--sage);
+    color: white;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  /* SHOPPING LIST */
+  .budget-bar {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    border: 1px solid #ede9e0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .budget-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--sage-dark);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .budget-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .budget-note {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .shop-section {
+    background: var(--white);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid #ede9e0;
+  }
+  .shop-section-header {
+    background: var(--warm);
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--sage-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .shop-section-header .icon { font-size: 1rem; }
+  .shop-items { padding: 8px 0; }
+  .shop-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 20px;
+    border-bottom: 1px solid #f5f2eb;
+    transition: background 0.15s;
+  }
+  .shop-item:last-child { border-bottom: none; }
+  .shop-item:hover { background: #faf8f3; }
+  .shop-item input[type=checkbox] {
+    width: 17px; height: 17px;
+    accent-color: var(--sage);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .shop-item label {
+    flex: 1;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .shop-item label.checked {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .shop-price {
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 600;
+    min-width: 52px;
+    text-align: right;
+  }
+  .total-row {
+    background: var(--sage-dark);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-weight: 600;
+  }
+  .total-row .amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+  }
+
+  /* NUTRITION NOTE */
+  .health-note {
+    background: linear-gradient(135deg, #e8f4ea, #f0ece2);
+    border-left: 4px solid var(--sage);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .health-note strong { color: var(--sage-dark); }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.8rem; }
+    .meals { grid-template-columns: 1fr; }
+    .meal { border-right: none; border-bottom: 1px solid #ede9e0; }
+    .meal:last-child { border-bottom: none; }
+    .nav-btn { padding: 12px 14px; font-size: 0.8rem; }
+    .ingredients-list { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 Your June Meal Plan</h1>
+  <p>June 5–30 · Plant-Based · Budget: $100</p>
+  <div class="badges">
+    <span class="badge">🥦 Vegan</span>
+    <span class="badge">🚫 Meat-Free</span>
+    <span class="badge">🚫 Dairy-Free</span>
+    <span class="badge">🧠 Parkinson's Friendly</span>
+    <span class="badge">💰 Under $100</span>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="showSection('plan')">Meal Plan</button>
+  <button class="nav-btn" onclick="showSection('recipes')">Recipes</button>
+  <button class="nav-btn" onclick="showSection('shopping')">Shopping List</button>
+  <button class="nav-btn" onclick="showSection('nutrition')">Nutrition Notes</button>
+</nav>
+
+<!-- MEAL PLAN -->
+<div id="plan" class="section active">
+  <div class="container">
+    <div class="health-note">
+      <strong>Tailored for Parkinson's Dysautonomia:</strong> Meals are high in antioxidants, fiber, omega-3s and anti-inflammatory foods. Small, frequent eating is encouraged. Meals are soft-friendly, easy to prepare, and support dopamine precursors and gut health.
+    </div>
+    <div class="week-tabs">
+      <button class="week-tab active" onclick="showWeek(1)">Week 1 (Jun 5–11)</button>
+      <button class="week-tab" onclick="showWeek(2)">Week 2 (Jun 12–18)</button>
+      <button class="week-tab" onclick="showWeek(3)">Week 3 (Jun 19–25)</button>
+      <button class="week-tab" onclick="showWeek(4)">Week 4 (Jun 26–30)</button>
+    </div>
+    <div id="week1" class="week-grid active"></div>
+    <div id="week2" class="week-grid"></div>
+    <div id="week3" class="week-grid"></div>
+    <div id="week4" class="week-grid"></div>
+  </div>
+</div>
+
+<!-- RECIPES -->
+<div id="recipes" class="section">
+  <div class="container">
+    <input class="recipe-search" type="text" placeholder="Search recipes…" oninput="filterRecipes(this.value)">
+    <div class="recipe-grid" id="recipeGrid"></div>
+  </div>
+</div>
+
+<!-- SHOPPING LIST -->
+<div id="shopping" class="section">
+  <div class="container">
+    <div class="budget-bar">
+      <div>
+        <div class="budget-big">$100</div>
+        <div class="budget-label">Total Budget</div>
+      </div>
+      <div>
+        <div class="budget-big" style="color:var(--accent)">~$91</div>
+        <div class="budget-label">Estimated Total</div>
+      </div>
+      <div class="budget-note">Prices are estimates based on typical US grocery store costs for 26 days of meals. Buying store brands and in-season produce will keep costs down. Check items as you shop!</div>
+    </div>
+    <div id="shoppingListContainer"></div>
+    <div class="total-row">
+      <span>Estimated Total</span>
+      <span class="amount">~$91</span>
+    </div>
+    <p style="font-size:0.8rem;color:var(--muted);margin-top:12px;text-align:center;">Prices vary by region & store. Staples like oats, rice, lentils and beans are very economical and anchor this plan.</p>
+  </div>
+</div>
+
+<!-- NUTRITION NOTES -->
+<div id="nutrition" class="section">
+  <div class="container">
+    <div style="background:var(--white);border-radius:12px;padding:28px;border:1px solid #ede9e0;">
+      <h2 style="font-family:'Playfair Display',serif;color:var(--sage-dark);margin-bottom:16px;">Nutrition & Parkinson's Dysautonomia</h2>
+      <div class="health-note" style="margin-bottom:16px;">
+        <strong>What is Dysautonomia with Parkinson's?</strong><br>
+        Dysautonomia affects the autonomic nervous system — regulating blood pressure, digestion, and temperature. Diet plays a significant role in managing symptoms.
+      </div>
+      <div style="display:grid;gap:16px;">
+        <div style="padding:16px;background:var(--cream);border-radius:8px;border-left:4px solid var(--accent);">
+          <strong style="color:var(--accent);">🫀 Blood Pressure & Hydration</strong><br>
+          <span style="font-size:0.88rem;">Dysautonomia can cause orthostatic hypotension. This plan avoids high-sodium processed foods. Hydrate consistently. Eat smaller, more frequent meals to avoid postprandial drops in blood pressure.</span>
+        </div>
+        <div style="padding:16px;background:var(--cream);border-radius:8px;border-left:4px solid var(--sage);">
+          <strong style="color:var(--sage-dark);">🧠 Dopamine Precursors</strong><br>
+          <span style="font-size:0.88rem;">Broad beans (fava), peas, and lentils contain L-dopa and tyrosine — natural dopamine precursors. However, high-protein foods can compete with levodopa absorption. This plan spaces protein and any medications appropriately.</span>
+        </div>
+        <div style="padding:16px;background:var(--cream);border-radius:8px;border-left:4px solid #7bb5c4;">
+          <strong style="color:#4a8a9c;">🌿 Anti-Inflammatory Focus</strong><br>
+          <span style="font-size:0.88rem;">Berries, flaxseed, walnuts, turmeric, ginger, leafy greens, and extra virgin olive oil are featured throughout. These combat neuroinflammation and oxidative stress linked to Parkinson's progression.</span>
+        </div>
+        <div style="padding:16px;background:var(--cream);border-radius:8px;border-left:4px solid #c4a73b;">
+          <strong style="color:#8a6b10;">💩 Gut Health & Motility</strong><br>
+          <span style="font-size:0.88rem;">Constipation is common in Parkinson's Dysautonomia. This plan is rich in fiber (oats, beans, vegetables, fruits), fermented foods (sauerkraut, miso), and hydrating foods to support gut motility.</span>
+        </div>
+        <div style="padding:16px;background:var(--cream);border-radius:8px;border-left:4px solid var(--sage-light);">
+          <strong style="color:var(--sage-dark);">⚡ Key Nutrients Included</strong><br>
+          <span style="font-size:0.88rem;"><b>B12:</b> Nutritional yeast, fortified plant milk · <b>Iron:</b> Lentils, spinach, pumpkin seeds · <b>Omega-3:</b> Flaxseed, chia, walnuts · <b>Calcium:</b> Fortified oat milk, kale, white beans · <b>Magnesium:</b> Pumpkin seeds, dark chocolate, spinach · <b>Folate:</b> Chickpeas, lentils, asparagus</span>
+        </div>
+        <div style="padding:16px;background:var(--cream);border-radius:8px;border-left:4px solid #d4a0c0;">
+          <strong style="color:#8a4a70;">⚠️ Important Notes</strong><br>
+          <span style="font-size:0.88rem;">Always consult your neurologist or dietitian regarding meal timing with medications like levodopa. Vitamin K in leafy greens should be consistent if on blood thinners. Fava beans contain natural levodopa and should be discussed with your doctor if you take levodopa medications.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECIPE MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const mealPlan = [
+  // WEEK 1: June 5-11
+  { day: 5, name: "Fri", breakfast: "Blueberry Oat Porridge", bDesc: "Oats with blueberries, flaxseed & almond butter", dinner: "Red Lentil Dal", dDesc: "Spiced dal with spinach over brown rice" },
+  { day: 6, name: "Sat", breakfast: "Avocado Toast with Hemp Seeds", bDesc: "Sourdough toast, avocado, lemon, hemp seeds", dinner: "Black Bean & Sweet Potato Tacos", dDesc: "Corn tortillas, roasted sweet potato, salsa, lime" },
+  { day: 7, name: "Sun", breakfast: "Chia Pudding with Mango", bDesc: "Oat milk chia pudding topped with fresh mango", dinner: "Chickpea & Tomato Stew", dDesc: "Rich tomato stew with chickpeas, kale & garlic bread" },
+  { day: 8, name: "Mon", breakfast: "Banana Walnut Oatmeal", bDesc: "Oats with banana, walnuts, cinnamon & maple syrup", dinner: "Miso Soup with Tofu & Soba Noodles", dDesc: "Warming miso broth with silken tofu, spinach & soba" },
+  { day: 9, name: "Tue", breakfast: "Green Smoothie Bowl", bDesc: "Spinach, banana, oat milk, topped with granola & berries", dinner: "Lentil & Vegetable Soup", dDesc: "Hearty green lentil soup with carrots, celery & herbs" },
+  { day: 10, name: "Wed", breakfast: "Peanut Butter Banana Toast", bDesc: "Whole grain toast with natural peanut butter & banana", dinner: "Stir-Fried Tofu with Broccoli & Brown Rice", dDesc: "Crispy tofu, broccoli, ginger, tamari sauce" },
+  { day: 11, name: "Thu", breakfast: "Overnight Oats with Berries", bDesc: "Oats soaked in oat milk with mixed berries & chia", dinner: "White Bean & Kale Soup", dDesc: "Tuscan-style white bean soup with kale and lemon" },
+  // WEEK 2: June 12-18
+  { day: 12, name: "Fri", breakfast: "Turmeric Golden Oatmeal", bDesc: "Oats with turmeric, ginger, black pepper & raisins", dinner: "Vegetable Curry with Coconut Milk", dDesc: "Potato, cauliflower, peas in fragrant coconut curry" },
+  { day: 13, name: "Sat", breakfast: "Avocado Smoothie", bDesc: "Avocado, banana, spinach, oat milk, lime blend", dinner: "Stuffed Bell Peppers with Quinoa", dDesc: "Quinoa, black beans, corn & tomato stuffed peppers" },
+  { day: 14, name: "Sun", breakfast: "Blueberry Flax Pancakes", bDesc: "Oat flour pancakes with blueberries & flaxseed", dinner: "Minestrone Soup", dDesc: "Classic Italian vegetable soup with chickpeas & pasta" },
+  { day: 15, name: "Mon", breakfast: "Oat Milk Yogurt Parfait", bDesc: "Store-bought or homemade oat yogurt with granola & fruit", dinner: "Spiced Chickpea Bowls", dDesc: "Roasted chickpeas over farro with roasted veggies & tahini" },
+  { day: 16, name: "Tue", breakfast: "Apple Cinnamon Overnight Oats", bDesc: "Oats with grated apple, cinnamon, walnuts & maple", dinner: "Tomato Basil Lentil Pasta", dDesc: "Red lentil pasta with fresh tomato basil sauce" },
+  { day: 17, name: "Wed", breakfast: "Pumpkin Seed Granola Bowl", bDesc: "Toasted oat granola, pumpkin seeds, oat milk & banana", dinner: "Vegetable Fried Brown Rice", dDesc: "Brown rice stir-fried with peas, carrots, edamame & ginger" },
+  { day: 18, name: "Thu", breakfast: "Mango Chia Smoothie", bDesc: "Mango, banana, chia seeds, oat milk & turmeric", dinner: "Loaded Baked Potato Soup", dDesc: "Creamy potato soup with scallions, broccoli & pumpkin seeds" },
+  // WEEK 3: June 19-25
+  { day: 19, name: "Fri", breakfast: "Walnut Raisin Oatmeal", bDesc: "Steel-cut oats with walnuts, raisins & cinnamon", dinner: "Black Bean Soup", dDesc: "Smoky black bean soup with cumin, lime & cilantro" },
+  { day: 20, name: "Sat", breakfast: "Berry Açaí Bowl", bDesc: "Frozen acai, mixed berries, banana, topped with oats & seeds", dinner: "Tofu Scramble with Roasted Veggies", dDesc: "Turmeric tofu scramble with bell peppers, onion & toast" },
+  { day: 21, name: "Sun", breakfast: "Lemon Poppy Seed Oatmeal", bDesc: "Oats with lemon zest, poppy seeds, almond butter", dinner: "Chickpea Shawarma Bowls", dDesc: "Spiced roasted chickpeas, cucumber, tomato, tahini & rice" },
+  { day: 22, name: "Mon", breakfast: "Peanut Butter Oat Smoothie", bDesc: "Oats, peanut butter, banana, oat milk & flaxseed blend", dinner: "Split Pea Soup", dDesc: "Creamy green split pea soup with carrots & herbs" },
+  { day: 23, name: "Tue", breakfast: "Banana Blueberry Oat Muffins", bDesc: "Baked oat-banana muffins with blueberries (batch)", dinner: "Lentil Shepherd's Pie", dDesc: "Lentil & vegetable filling topped with mashed potato" },
+  { day: 24, name: "Wed", breakfast: "Savory Oatmeal", bDesc: "Oats cooked savory with spinach, garlic & nutritional yeast", dinner: "Thai-Inspired Peanut Noodles", dDesc: "Rice noodles with peanut sauce, edamame & shredded carrots" },
+  { day: 25, name: "Thu", breakfast: "Tropical Smoothie Bowl", bDesc: "Pineapple, mango, banana, oat milk topped with coconut & seeds", dinner: "Mushroom Barley Soup", dDesc: "Hearty mushroom soup with barley, thyme & kale" },
+  // WEEK 4: June 26-30
+  { day: 26, name: "Fri", breakfast: "Almond Butter Overnight Oats", bDesc: "Oats, almond butter, banana, chia & oat milk", dinner: "Red Bean & Rice Stew", dDesc: "Cajun-spiced red beans with brown rice & greens" },
+  { day: 27, name: "Sat", breakfast: "Green Detox Smoothie", bDesc: "Spinach, cucumber, ginger, lemon, banana & oat milk", dinner: "Roasted Vegetable Quinoa Bowls", dDesc: "Quinoa with roasted seasonal veggies, lemon dressing" },
+  { day: 28, name: "Sun", breakfast: "Oat Waffles with Berries", bDesc: "Crispy oat flour waffles with mixed berries & maple syrup", dinner: "Tomato & Lentil Stew", dDesc: "Warming lentil stew with roasted tomatoes & crusty bread" },
+  { day: 29, name: "Mon", breakfast: "Chia Pudding with Kiwi", bDesc: "Oat milk chia pudding with sliced kiwi & hemp seeds", dinner: "Vegetable Udon Noodle Soup", dDesc: "Udon in miso broth with bok choy, mushrooms & tofu" },
+  { day: 30, name: "Tue", breakfast: "Celebration Smoothie Bowl", bDesc: "Mixed berry, banana, spinach bowl topped with all the good things", dinner: "Big Pot Minestrone", dDesc: "End-of-month hearty vegetable soup using pantry staples" },
+];
+
+const recipes = [
+  {
+    title: "Blueberry Oat Porridge",
+    type: "Breakfast",
+    summary: "Antioxidant-rich oat porridge perfect for morning neuroprotection",
+    serves: "1", time: "10 min",
+    ingredients: ["1 cup rolled oats", "2 cups oat milk", "½ cup blueberries", "1 tbsp ground flaxseed", "1 tbsp almond butter", "1 tsp maple syrup", "Pinch of cinnamon"],
+    steps: ["Bring oat milk to a gentle simmer in a small pot.", "Add oats and stir, cooking on medium-low for 5 minutes until creamy.", "Stir in flaxseed and cinnamon.", "Top with blueberries, almond butter, and a drizzle of maple syrup."]
+  },
+  {
+    title: "Red Lentil Dal",
+    type: "Dinner",
+    summary: "Protein-rich, anti-inflammatory comfort food over brown rice",
+    serves: "4", time: "30 min",
+    ingredients: ["1½ cups red lentils", "1 can diced tomatoes", "1 large onion, diced", "3 cloves garlic", "1 tbsp fresh ginger", "1 tsp turmeric", "1 tsp cumin", "1 tsp coriander", "2 cups spinach", "2 cups brown rice", "Salt to taste", "Cilantro to garnish"],
+    steps: ["Rinse lentils. Cook onion in a large pot with a splash of water for 5 min.", "Add garlic, ginger, and spices; cook 1 minute.", "Add lentils, tomatoes, and 3 cups water. Simmer 20 minutes until lentils are soft.", "Stir in spinach and cook 2 more minutes.", "Serve over cooked brown rice and garnish with cilantro."]
+  },
+  {
+    title: "Black Bean & Sweet Potato Tacos",
+    type: "Dinner",
+    summary: "Colorful, fiber-rich tacos packed with beta-carotene and protein",
+    serves: "4", time: "35 min",
+    ingredients: ["2 medium sweet potatoes, cubed", "1 can black beans, drained", "8 corn tortillas", "1 tsp cumin", "1 tsp smoked paprika", "½ tsp chili powder", "Salsa", "Lime juice", "Avocado slices", "Cilantro"],
+    steps: ["Toss sweet potato cubes with spices and roast at 400°F for 25 min until tender.", "Warm black beans in a pan with a little cumin and salt.", "Warm tortillas in a dry pan.", "Assemble tacos with sweet potato, beans, avocado, salsa, cilantro, and lime."]
+  },
+  {
+    title: "Chia Pudding with Mango",
+    type: "Breakfast",
+    summary: "Omega-3 and fiber-rich pudding, made the night before",
+    serves: "2", time: "5 min + overnight",
+    ingredients: ["⅓ cup chia seeds", "1½ cups oat milk", "1 tbsp maple syrup", "½ tsp vanilla extract", "1 ripe mango, diced"],
+    steps: ["Mix chia seeds, oat milk, maple syrup, and vanilla in a jar.", "Stir well, let sit 5 minutes, stir again.", "Cover and refrigerate overnight (or at least 4 hours).", "Top with fresh mango before serving."]
+  },
+  {
+    title: "Chickpea & Tomato Stew",
+    type: "Dinner",
+    summary: "Mediterranean-inspired stew loaded with lycopene and fiber",
+    serves: "4", time: "25 min",
+    ingredients: ["2 cans chickpeas, drained", "1 can crushed tomatoes", "1 bunch kale, chopped", "1 onion, diced", "4 cloves garlic", "1 tsp smoked paprika", "1 tsp cumin", "½ tsp oregano", "Olive oil", "Salt & pepper", "Whole grain bread"],
+    steps: ["Sauté onion in olive oil until soft. Add garlic and spices.", "Add crushed tomatoes and chickpeas. Simmer 12 minutes.", "Stir in kale, cook until wilted, about 3 minutes.", "Season with salt & pepper. Serve with whole grain bread."]
+  },
+  {
+    title: "Miso Soup with Tofu & Soba",
+    type: "Dinner",
+    summary: "Probiotic-rich gut-friendly soup with warming protein",
+    serves: "3", time: "20 min",
+    ingredients: ["4 cups water", "3 tbsp white miso paste", "200g silken tofu, cubed", "100g soba noodles", "2 cups baby spinach", "2 scallions, sliced", "1 tsp sesame oil", "1 sheet nori, cut (optional)"],
+    steps: ["Cook soba noodles per package; drain and set aside.", "Bring water to near-boil (do NOT boil miso). Reduce heat.", "Whisk miso into water until dissolved.", "Add tofu, spinach, and scallions; heat gently 2 minutes.", "Divide noodles into bowls, ladle soup over, drizzle sesame oil."]
+  },
+  {
+    title: "Lentil & Vegetable Soup",
+    type: "Dinner",
+    summary: "Iron-rich, filling soup that's easy on the digestive system",
+    serves: "6", time: "40 min",
+    ingredients: ["1½ cups green lentils", "3 carrots, sliced", "3 stalks celery", "1 onion, diced", "3 cloves garlic", "1 can diced tomatoes", "1 tsp cumin", "1 tsp thyme", "1 bay leaf", "5 cups vegetable broth", "Lemon juice", "Salt & pepper"],
+    steps: ["Sauté onion, carrots, celery in a large pot for 5 minutes.", "Add garlic, cumin, thyme, bay leaf; cook 1 minute.", "Add lentils, tomatoes, and broth. Bring to boil then simmer 30 minutes.", "Remove bay leaf. Squeeze lemon juice over. Season and serve."]
+  },
+  {
+    title: "Stir-Fried Tofu with Broccoli",
+    type: "Dinner",
+    summary: "High-protein, sulforaphane-rich stir fry over whole grain rice",
+    serves: "3", time: "25 min",
+    ingredients: ["300g firm tofu, pressed & cubed", "3 cups broccoli florets", "2 cups brown rice, cooked", "3 tbsp tamari (low sodium)", "1 tbsp rice vinegar", "1 tbsp sesame oil", "2 cloves garlic", "1 tsp fresh ginger", "1 tsp cornstarch", "Sesame seeds"],
+    steps: ["Press tofu dry. Pan-fry in a non-stick pan until golden on all sides.", "Mix tamari, vinegar, cornstarch, and 2 tbsp water for sauce.", "Stir-fry garlic and ginger 30 seconds, add broccoli, cook 4 minutes.", "Add tofu, pour sauce over, toss 2 minutes until glossy.", "Serve over brown rice, sprinkle with sesame seeds."]
+  },
+  {
+    title: "White Bean & Kale Soup",
+    type: "Dinner",
+    summary: "Tuscan-style calcium and fiber powerhouse",
+    serves: "5", time: "30 min",
+    ingredients: ["2 cans white cannellini beans", "1 bunch kale, stems removed", "1 onion, diced", "4 cloves garlic", "1 can diced tomatoes", "4 cups vegetable broth", "1 tsp rosemary", "½ tsp red pepper flakes", "Juice of 1 lemon", "Olive oil"],
+    steps: ["Sauté onion in olive oil 5 minutes. Add garlic, rosemary, pepper flakes.", "Add tomatoes and broth; bring to simmer.", "Add beans and cook 10 minutes.", "Add kale; cook 5 more minutes until wilted.", "Finish with lemon juice. Serve with sourdough if desired."]
+  },
+  {
+    title: "Vegetable Curry with Coconut Milk",
+    type: "Dinner",
+    summary: "Warming anti-inflammatory curry with healthy fats from coconut",
+    serves: "4", time: "35 min",
+    ingredients: ["2 medium potatoes, cubed", "1 cup cauliflower florets", "1 cup green peas", "1 can coconut milk", "1 can diced tomatoes", "1 onion", "3 cloves garlic", "1 tbsp curry powder", "1 tsp turmeric", "1 tsp cumin", "Brown rice to serve", "Cilantro"],
+    steps: ["Sauté onion until soft. Add garlic, curry powder, turmeric, cumin.", "Add tomatoes; cook 2 minutes.", "Add potato, cauliflower, and coconut milk. Simmer 20 minutes.", "Stir in peas for last 3 minutes.", "Serve over brown rice with fresh cilantro."]
+  },
+  {
+    title: "Stuffed Bell Peppers with Quinoa",
+    type: "Dinner",
+    summary: "Complete protein quinoa filling in colorful bell peppers",
+    serves: "4", time: "45 min",
+    ingredients: ["4 large bell peppers", "1 cup quinoa", "1 can black beans", "1 cup corn", "1 cup salsa", "1 tsp cumin", "1 tsp smoked paprika", "2 scallions", "Lime", "Nutritional yeast (optional topping)"],
+    steps: ["Cook quinoa per package directions. Preheat oven to 375°F.", "Mix quinoa with beans, corn, salsa, cumin, paprika, and scallions.", "Cut tops off peppers and remove seeds.", "Fill peppers with quinoa mixture. Sprinkle nutritional yeast on top.", "Bake 30 minutes until peppers are tender."]
+  },
+  {
+    title: "Spiced Chickpea Bowls",
+    type: "Dinner",
+    summary: "Roasted chickpeas with tahini dressing over grains and greens",
+    serves: "3", time: "35 min",
+    ingredients: ["2 cans chickpeas, drained", "2 cups farro or brown rice", "2 tbsp olive oil", "1 tsp cumin", "1 tsp paprika", "½ tsp coriander", "2 cups mixed greens", "Cherry tomatoes", "Cucumber, sliced", "3 tbsp tahini", "Juice of 1 lemon", "Garlic clove"],
+    steps: ["Toss chickpeas with olive oil, cumin, paprika, coriander. Roast at 400°F for 30 minutes until crispy.", "Cook farro per package directions.", "Blend tahini, lemon juice, garlic, and 2-3 tbsp water for dressing.", "Assemble bowls: farro, greens, chickpeas, tomatoes, cucumber.", "Drizzle tahini dressing over."]
+  },
+  {
+    title: "Thai-Inspired Peanut Noodles",
+    type: "Dinner",
+    summary: "Easy protein-rich noodles with a creamy peanut sauce",
+    serves: "4", time: "20 min",
+    ingredients: ["200g rice noodles", "1 cup edamame (frozen)", "2 carrots, shredded", "3 scallions", "3 tbsp peanut butter", "2 tbsp tamari", "1 tbsp rice vinegar", "1 tsp sesame oil", "1 tsp maple syrup", "1 tsp ginger", "1 clove garlic", "Lime", "Sesame seeds", "Cilantro"],
+    steps: ["Cook rice noodles per package; rinse with cold water.", "Mix peanut butter, tamari, vinegar, sesame oil, maple syrup, ginger, garlic, and 3 tbsp warm water.", "Cook edamame per package directions.", "Toss noodles with peanut sauce, carrots, and edamame.", "Top with scallions, sesame seeds, cilantro, and lime."]
+  },
+  {
+    title: "Lentil Shepherd's Pie",
+    type: "Dinner",
+    summary: "Warming comfort food with a fluffy mashed potato topping",
+    serves: "6", time: "55 min",
+    ingredients: ["1½ cups green lentils", "3 large potatoes", "2 carrots, diced", "1 cup peas", "1 onion, diced", "3 cloves garlic", "2 tbsp tomato paste", "1 tsp thyme", "1 tsp rosemary", "2 cups vegetable broth", "Oat milk for mashing", "Salt & pepper"],
+    steps: ["Boil potatoes until soft; mash with oat milk and salt. Set aside.", "Sauté onion and carrots 5 min. Add garlic, thyme, rosemary.", "Add lentils, tomato paste, and broth. Simmer 25 min until lentils tender.", "Stir in peas. Transfer to baking dish.", "Spread mash over lentils. Bake at 375°F for 20 minutes until golden."]
+  },
+  {
+    title: "Banana Blueberry Oat Muffins",
+    type: "Breakfast",
+    summary: "Batch-bake these for easy grab-and-go mornings all week",
+    serves: "12 muffins", time: "30 min",
+    ingredients: ["2 ripe bananas, mashed", "1½ cups rolled oats", "1 cup oat flour", "½ cup blueberries", "⅓ cup maple syrup", "½ cup oat milk", "2 tbsp ground flaxseed", "1 tsp baking powder", "½ tsp cinnamon", "½ tsp vanilla"],
+    steps: ["Preheat oven to 375°F. Line a muffin tin.", "Mix mashed banana, oat milk, maple syrup, flaxseed, and vanilla.", "Stir in oats, oat flour, baking powder, and cinnamon.", "Fold in blueberries.", "Fill muffin cups ¾ full. Bake 22 minutes until toothpick clean."]
+  },
+  {
+    title: "Blueberry Flax Pancakes",
+    type: "Breakfast",
+    summary: "Fluffy weekend pancakes with omega-3 flaxseed boost",
+    serves: "2", time: "20 min",
+    ingredients: ["1 cup oat flour", "1 tbsp ground flaxseed", "1 tsp baking powder", "¾ cup oat milk", "1 tbsp maple syrup", "½ tsp vanilla", "½ cup blueberries", "Pinch of salt"],
+    steps: ["Mix oat flour, flaxseed, baking powder, and salt.", "Whisk oat milk, maple syrup, and vanilla together.", "Combine wet and dry; fold in blueberries.", "Cook on a medium non-stick pan, about 3 min per side.", "Serve with extra berries and maple syrup."]
+  },
+  {
+    title: "Mushroom Barley Soup",
+    type: "Dinner",
+    summary: "Earthy, beta-glucan-rich soup for immune and heart health",
+    serves: "5", time: "50 min",
+    ingredients: ["300g mushrooms, sliced", "½ cup pearl barley", "1 onion, diced", "3 carrots, sliced", "2 stalks celery", "3 cloves garlic", "2 cups kale, chopped", "5 cups vegetable broth", "1 tsp thyme", "1 tsp tamari", "Salt & pepper", "Fresh parsley"],
+    steps: ["Sauté onion, carrots, celery 5 min. Add garlic and mushrooms.", "Cook mushrooms until they release their liquid and begin to brown.", "Add barley, broth, thyme, and tamari. Simmer 35 minutes.", "Add kale last 5 minutes.", "Season and garnish with fresh parsley."]
+  },
+];
+
+const shoppingData = [
+  {
+    category: "🌾 Grains & Staples",
+    items: [
+      { name: "Rolled oats (large container)", qty: "42oz", price: 4.50 },
+      { name: "Brown rice (5 lb bag)", qty: "5 lb", price: 4.00 },
+      { name: "Quinoa", qty: "1 lb", price: 4.50 },
+      { name: "Soba noodles", qty: "8oz", price: 3.00 },
+      { name: "Rice noodles", qty: "1 lb", price: 2.50 },
+      { name: "Udon noodles", qty: "1 lb", price: 3.00 },
+      { name: "Whole grain sourdough bread", qty: "2 loaves", price: 6.00 },
+      { name: "Corn tortillas", qty: "30 ct", price: 3.00 },
+      { name: "Oat flour", qty: "2 lb", price: 3.50 },
+      { name: "Pearl barley", qty: "1 lb", price: 2.50 },
+      { name: "Farro", qty: "1 lb", price: 3.50 },
+    ]
+  },
+  {
+    category: "🥫 Canned & Packaged Goods",
+    items: [
+      { name: "Canned chickpeas (×6 cans)", qty: "×6", price: 5.40 },
+      { name: "Canned black beans (×4 cans)", qty: "×4", price: 3.60 },
+      { name: "Canned white cannellini beans (×4)", qty: "×4", price: 3.60 },
+      { name: "Canned red kidney beans (×2)", qty: "×2", price: 1.80 },
+      { name: "Red lentils (1 lb)", qty: "1 lb", price: 2.00 },
+      { name: "Green lentils (1 lb)", qty: "1 lb", price: 2.00 },
+      { name: "Split peas (1 lb)", qty: "1 lb", price: 2.00 },
+      { name: "Canned diced tomatoes (×6)", qty: "×6", price: 5.40 },
+      { name: "Canned crushed tomatoes (×3)", qty: "×3", price: 2.70 },
+      { name: "Canned coconut milk (×2)", qty: "×2", price: 3.50 },
+      { name: "Vegetable broth (32oz ×4)", qty: "×4", price: 8.00 },
+      { name: "Tomato paste (small can)", qty: "1", price: 1.00 },
+    ]
+  },
+  {
+    category: "🥛 Plant-Based Dairy & Protein",
+    items: [
+      { name: "Oat milk (½ gal ×4)", qty: "×4", price: 14.00 },
+      { name: "Firm tofu (14oz ×3)", qty: "×3", price: 7.50 },
+      { name: "Silken tofu (12oz ×1)", qty: "×1", price: 2.50 },
+      { name: "White miso paste", qty: "8oz", price: 3.50 },
+      { name: "Nutritional yeast", qty: "8oz", price: 4.50 },
+      { name: "Natural peanut butter", qty: "16oz", price: 3.50 },
+      { name: "Almond butter", qty: "12oz", price: 5.00 },
+      { name: "Tahini", qty: "8oz", price: 4.00 },
+    ]
+  },
+  {
+    category: "🥬 Fresh Produce",
+    items: [
+      { name: "Bananas (×4 bunches over month)", qty: "×4", price: 5.00 },
+      { name: "Avocados (×6)", qty: "×6", price: 6.00 },
+      { name: "Sweet potatoes (5 lb)", qty: "5 lb", price: 4.50 },
+      { name: "Potatoes (5 lb)", qty: "5 lb", price: 3.50 },
+      { name: "Baby spinach (×3 bags)", qty: "×3", price: 9.00 },
+      { name: "Kale (×3 bunches)", qty: "×3", price: 5.00 },
+      { name: "Broccoli (×3 heads)", qty: "×3", price: 5.00 },
+      { name: "Cauliflower (×2 heads)", qty: "×2", price: 5.00 },
+      { name: "Bell peppers (×6)", qty: "×6", price: 6.00 },
+      { name: "Carrots (2 lb bag)", qty: "2 lb", price: 2.00 },
+      { name: "Celery (bunch)", qty: "1", price: 1.50 },
+      { name: "Onions (3 lb bag)", qty: "3 lb", price: 2.50 },
+      { name: "Garlic (head ×3)", qty: "×3", price: 2.50 },
+      { name: "Mushrooms (8oz ×2)", qty: "×2", price: 5.00 },
+      { name: "Lemons (×4)", qty: "×4", price: 3.00 },
+      { name: "Limes (×4)", qty: "×4", price: 2.50 },
+      { name: "Bok choy (×2)", qty: "×2", price: 3.00 },
+      { name: "Mango (×2)", qty: "×2", price: 3.50 },
+      { name: "Mixed berries (×2 pints)", qty: "×2", price: 8.00 },
+    ]
+  },
+  {
+    category: "❄️ Frozen Goods",
+    items: [
+      { name: "Frozen blueberries (24oz)", qty: "24oz", price: 5.50 },
+      { name: "Frozen edamame (1 lb)", qty: "1 lb", price: 3.00 },
+      { name: "Frozen green peas (1 lb)", qty: "1 lb", price: 2.00 },
+      { name: "Frozen corn (1 lb)", qty: "1 lb", price: 2.00 },
+      { name: "Frozen mango chunks (1 lb)", qty: "1 lb", price: 3.50 },
+    ]
+  },
+  {
+    category: "🌿 Seeds, Nuts & Pantry",
+    items: [
+      { name: "Chia seeds (12oz)", qty: "12oz", price: 4.50 },
+      { name: "Ground flaxseed (16oz)", qty: "16oz", price: 4.00 },
+      { name: "Hemp seeds (8oz)", qty: "8oz", price: 5.00 },
+      { name: "Pumpkin seeds (8oz)", qty: "8oz", price: 4.00 },
+      { name: "Walnuts (8oz)", qty: "8oz", price: 5.50 },
+      { name: "Maple syrup (8oz)", qty: "8oz", price: 5.00 },
+      { name: "Olive oil (16oz)", qty: "16oz", price: 5.50 },
+      { name: "Sesame oil (small)", qty: "8oz", price: 3.50 },
+      { name: "Tamari low-sodium soy sauce", qty: "10oz", price: 3.50 },
+      { name: "Rice vinegar", qty: "12oz", price: 2.50 },
+    ]
+  },
+  {
+    category: "🌶 Spices (if not already owned)",
+    items: [
+      { name: "Turmeric, cumin, coriander, paprika (bulk or small jars)", qty: "set", price: 4.00 },
+      { name: "Cinnamon, black pepper, red pepper flakes", qty: "set", price: 2.00 },
+      { name: "Thyme, rosemary, oregano", qty: "set", price: 2.00 },
+      { name: "Curry powder", qty: "1 jar", price: 2.50 },
+    ]
+  },
+];
+
+// ===================== RENDER =====================
+function renderPlan() {
+  const weeks = [[5,11],[12,18],[19,25],[26,30]];
+  weeks.forEach(([start, end], wi) => {
+    const el = document.getElementById(`week${wi+1}`);
+    const days = mealPlan.filter(d => d.day >= start && d.day <= end);
+    el.innerHTML = days.map(d => `
+      <div class="day-card">
+        <div class="day-header">
+          <div class="day-num">${d.day}</div>
+          <div><div class="day-name">June ${d.day} · ${d.name}</div></div>
+        </div>
+        <div class="meals">
+          <div class="meal">
+            <div class="meal-label">☀️ Breakfast</div>
+            <div class="meal-name">${d.breakfast}</div>
+            <div class="meal-desc">${d.bDesc}</div>
+            <div class="meal-tags"><span class="tag green">Plant-Based</span><span class="tag">Quick</span></div>
+          </div>
+          <div class="meal">
+            <div class="meal-label">🌙 Dinner</div>
+            <div class="meal-name">${d.dinner}</div>
+            <div class="meal-desc">${d.dDesc}</div>
+            <div class="meal-tags"><span class="tag green">High Fiber</span><span class="tag">Anti-Inflammatory</span></div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+function renderRecipes() {
+  const grid = document.getElementById('recipeGrid');
+  grid.innerHTML = recipes.map((r,i) => `
+    <div class="recipe-card" onclick="openRecipe(${i})">
+      <div class="recipe-type">${r.type === 'Breakfast' ? '☀️' : '🌙'} ${r.type}</div>
+      <div class="recipe-title">${r.title}</div>
+      <div class="recipe-summary">${r.summary}</div>
+      <div style="margin-top:10px;font-size:0.78rem;color:var(--sage-dark)">⏱ ${r.time} · Serves ${r.serves}</div>
+    </div>
+  `).join('');
+}
+
+function filterRecipes(q) {
+  const q2 = q.toLowerCase();
+  document.querySelectorAll('.recipe-card').forEach((card, i) => {
+    const r = recipes[i];
+    const match = r.title.toLowerCase().includes(q2) || r.type.toLowerCase().includes(q2) || r.summary.toLowerCase().includes(q2);
+    card.style.display = match ? '' : 'none';
+  });
+}
+
+function openRecipe(i) {
+  const r = recipes[i];
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="recipe-type">${r.type === 'Breakfast' ? '☀️' : '🌙'} ${r.type}</div>
+    <h2>${r.title}</h2>
+    <div class="modal-meta">⏱ ${r.time} · Serves ${r.serves} · Plant-Based · Dairy-Free · Meat-Free</div>
+    <h3>Ingredients</h3>
+    <ul class="ingredients-list">${r.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+    <h3>Instructions</h3>
+    <ol class="steps-list">${r.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOnBg(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+function renderShopping() {
+  const container = document.getElementById('shoppingListContainer');
+  container.innerHTML = shoppingData.map((section, si) => `
+    <div class="shop-section">
+      <div class="shop-section-header" onclick="toggleSection(${si})">
+        <span>${section.category}</span>
+        <span style="font-size:0.8rem;color:var(--muted)">$${section.items.reduce((s,i) => s+i.price, 0).toFixed(2)}</span>
+      </div>
+      <div class="shop-items" id="section-${si}">
+        ${section.items.map((item, ii) => `
+          <div class="shop-item">
+            <input type="checkbox" id="item-${si}-${ii}" onchange="updateLabel(${si},${ii})">
+            <label for="item-${si}-${ii}" id="label-${si}-${ii}">${item.name} <span style="color:var(--muted);font-size:0.8rem">(${item.qty})</span></label>
+            <span class="shop-price">$${item.price.toFixed(2)}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSection(si) {
+  const el = document.getElementById(`section-${si}`);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateLabel(si, ii) {
+  const cb = document.getElementById(`item-${si}-${ii}`);
+  const label = document.getElementById(`label-${si}-${ii}`);
+  label.className = cb.checked ? 'checked' : '';
+}
+
+// ===================== NAV =====================
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function showWeek(n) {
+  document.querySelectorAll('.week-grid').forEach(w => w.classList.remove('active'));
+  document.getElementById(`week${n}`).classList.add('active');
+  document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// Init
+renderPlan();
+renderRecipes();
+renderShopping();
+</script>
+</body>
+</html>
