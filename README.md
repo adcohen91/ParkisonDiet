@@ -17,6 +17,8 @@ An Exmaple Menu starts at # Example Menu
 12) All system information can be found in the .env file
 13) An example html file to serve as a final result is located in meal-plan.html file
 14) Additional build inforaation is contained in the file <!DOCTYPE.txt
+15) After the build is complete test each component
+16) Push the application to AWS
 
 # Example Menu
 
