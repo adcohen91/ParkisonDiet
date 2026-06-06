@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParkinsonDiet — Build Your Meal Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sage:         #7a9e7e;
+      --sage-light:   #b5cdb7;
+      --sage-dark:    #4a6b4e;
+      --cream:        #faf7f2;
+      --warm:         #f0e8d5;
+      --text:         #2a2a2a;
+      --muted:        #6b6b6b;
+      --accent:       #c4713b;
+      --accent-light: #f2dcc8;
+      --white:        #ffffff;
+      --border:       #e4ddd2;
+      --border-card:  #ede9e0;
+      --error:        #c0392b;
+      --error-bg:     #fdf0ee;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─────────────────── WIZARD ─────────────────── */
+    #wizard {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top brand bar */
+    .wiz-brand {
+      background: var(--white);
+      border-bottom: 2px solid var(--warm);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .wiz-mark {
+      width: 38px; height: 38px; border-radius: 50%; flex: none;
+      background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+      display: flex; align-items: center; justify-content: center;
+    }
+    .wiz-mark svg { width: 20px; height: 20px; color: white; }
+    .wiz-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 700; color: var(--sage-dark);
+    }
+    .wiz-brand-sub {
+      font-size: 0.75rem; color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .wiz-brand-credit {
+      font-size: 0.72rem; color: var(--muted); margin-top: 2px;
+    }
+    .brand-link {
+      color: var(--sage-dark); text-decoration: none; font-weight: 600;
+    }
+    .brand-link:hover { text-decoration: underline; }
+
+    /* Progress bar */
+    .wiz-progress {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px 0;
+    }
+    .progress-labels {
+      display: flex; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .progress-label {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted);
+      transition: color 0.2s;
+    }
+    .progress-label.active { color: var(--sage-dark); }
+    .progress-label.done   { color: var(--sage); }
+    .progress-track {
+      height: 4px; background: var(--warm); border-radius: 2px;
+      margin-bottom: 0;
+    }
+    .progress-fill {
+      height: 4px; background: var(--sage); border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* Step container */
+    .wiz-body {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px 24px;
+    }
+    .step-card {
+      background: var(--white);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 36px 40px;
+      width: 100%; max-width: 560px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .step-num {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--sage); margin-bottom: 6px;
+    }
+    .step-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem; font-weight: 700; color: var(--sage-dark);
+      margin-bottom: 8px;
+    }
+    .step-desc {
+      font-size: 0.92rem; color: var(--muted);
+      margin-bottom: 28px; line-height: 1.6;
+    }
+
+    /* Field */
+    .field { margin-bottom: 20px; }
+    .field-label {
+      display: block; font-size: 0.83rem; font-weight: 700;
+      color: var(--sage-dark); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .field-input {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid var(--border); border-radius: 8px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.95rem;
+      color: var(--text); background: var(--cream);
+      transition: border-color 0.2s; outline: none;
+    }
+    .field-input:focus { border-color: var(--sage); background: var(--white); }
+    .field-input[type=number] { -moz-appearance: textfield; }
+    .field-input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .field-hint { font-size: 0.78rem; color: var(--muted); margin-top: 5px; }
+    .field-error { font-size: 0.78rem; color: var(--error); margin-top: 5px; display: none; }
+
+    /* Date range */
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .range-summary {
+      margin-top: 14px; padding: 12px 16px;
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 0.88rem; color: var(--text);
+    }
+    .range-count { font-weight: 700; color: var(--sage-dark); }
+    .range-warn  { color: var(--error); font-weight: 700; }
+
+    /* Calendar grid */
+    .calendar-wrap { margin-top: 16px; }
+    .cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .cal-nav {
+      background: none; border: 1px solid var(--border);
+      border-radius: 6px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--muted);
+      transition: all 0.15s;
+    }
+    .cal-nav:hover { border-color: var(--sage); color: var(--sage-dark); }
+    .cal-month {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700; color: var(--sage-dark);
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+    }
+    .cal-dow {
+      text-align: center; font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; color: var(--muted); padding: 4px 0;
+    }
+    .cal-day {
+      text-align: center; font-size: 0.85rem; padding: 7px 4px;
+      border-radius: 6px; cursor: pointer;
+      transition: background 0.12s;
+    }
+    .cal-day:hover:not(.cal-empty):not(.cal-past) { background: var(--warm); }
+    .cal-day.cal-empty { cursor: default; }
+    .cal-day.cal-past  { color: var(--muted); cursor: not-allowed; opacity: 0.45; }
+    .cal-day.cal-start,
+    .cal-day.cal-end   {
+      background: var(--sage); color: white; font-weight: 700;
+      border-radius: 8px;
+    }
+    .cal-day.cal-in-range {
+      background: #dff0e0; color: var(--sage-dark);
+    }
+    .cal-day.cal-today { font-weight: 700; color: var(--accent); }
+
+    /* Radio cards */
+    .radio-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .radio-card input { display: none; }
+    .radio-card label {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; padding: 18px 12px;
+      border: 2px solid var(--border); border-radius: 10px;
+      cursor: pointer; transition: all 0.18s;
+      text-align: center;
+    }
+    .radio-card label .rc-icon { font-size: 1.6rem; }
+    .radio-card label .rc-label {
+      font-weight: 700; font-size: 0.9rem; color: var(--sage-dark);
+    }
+    .radio-card label .rc-desc { font-size: 0.75rem; color: var(--muted); }
+    .radio-card input:checked + label {
+      border-color: var(--sage); background: #edf5ee;
+    }
+    .radio-card input:checked + label .rc-label { color: var(--sage-dark); }
+
+    /* Checkboxes */
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check-item { display: flex; align-items: center; gap: 10px; }
+    .check-item input[type=checkbox] {
+      width: 18px; height: 18px; accent-color: var(--sage);
+      cursor: pointer; flex-shrink: 0; border-radius: 4px;
+    }
+    .check-item label { font-size: 0.9rem; cursor: pointer; }
+    .check-divider {
+      margin: 18px 0 12px;
+      border: none; border-top: 1px solid var(--border);
+    }
+    .vegan-toggle {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      background: var(--cream); border: 2px solid var(--border);
+      border-radius: 10px; cursor: pointer; transition: all 0.18s;
+      margin-top: 4px;
+    }
+    .vegan-toggle.active { border-color: var(--sage); background: #edf5ee; }
+    .vegan-toggle input { width: 18px; height: 18px; accent-color: var(--sage); cursor: pointer; }
+    .vegan-toggle .vt-text { font-weight: 700; color: var(--sage-dark); font-size: 0.95rem; }
+    .vegan-toggle .vt-sub  { font-size: 0.78rem; color: var(--muted); }
+
+    /* Budget slider */
+    .budget-display {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.6rem; font-weight: 700; color: var(--sage-dark);
+      text-align: center; margin-bottom: 4px;
+    }
+    .budget-label-sub { text-align: center; font-size: 0.8rem; color: var(--muted); margin-bottom: 18px; }
+    input[type=range] {
+      width: 100%; accent-color: var(--sage);
+      height: 6px; cursor: pointer;
+    }
+    .budget-marks {
+      display: flex; justify-content: space-between;
+      margin-top: 8px; font-size: 0.72rem; color: var(--muted);
+    }
+
+    /* Wizard footer */
+    .wiz-footer {
+      background: var(--white); border-top: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .btn-back {
+      background: none; border: 2px solid var(--border); border-radius: 8px;
+      padding: 10px 22px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; font-weight: 600;
+      color: var(--muted); cursor: pointer; transition: all 0.15s;
+    }
+    .btn-back:hover { border-color: var(--sage); color: var(--sage-dark); }
+    .btn-back:disabled { opacity: 0.35; cursor: default; }
+    .btn-next {
+      background: var(--sage); border: none; border-radius: 8px;
+      padding: 11px 28px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.95rem; font-weight: 700;
+      color: white; cursor: pointer; transition: background 0.15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-next:hover { background: var(--sage-dark); }
+    .btn-next.is-generate { background: var(--accent); }
+    .btn-next.is-generate:hover { background: #a5602f; }
+
+    /* ─────────────────── LOADING ─────────────────── */
+    #loading {
+      min-height: 100vh; display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 24px; background: var(--cream); padding: 32px;
+    }
+    .loading-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+      display: flex; align-items: center; justify-content: center;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .loading-icon svg { width: 36px; height: 36px; color: white; }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    .loading-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem; font-weight: 700; color: var(--sage-dark); text-align: center;
+    }
+    .loading-sub { font-size: 0.95rem; color: var(--muted); text-align: center; max-width: 400px; }
+    .loading-dots { display: flex; gap: 8px; }
+    .loading-dots span {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--sage-light);
+      animation: bounce 1.2s infinite;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: .2s; }
+    .loading-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-8px); } }
+
+    /* ─────────────────── RESULTS ─────────────────── */
+    #results { display: none; }
+
+    /* Header */
+    .plan-header {
+      background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 60%, var(--sage-light) 100%);
+      color: white; padding: 48px 32px 36px; text-align: center; position: relative; overflow: hidden;
+    }
+    .plan-header::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .plan-header h1 {
+      font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700;
+      margin-bottom: 8px; position: relative;
+    }
+    .plan-header p { font-size: 1rem; opacity: 0.85; font-weight: 300; position: relative; }
+    .badges {
+      display: flex; justify-content: center; gap: 10px;
+      margin-top: 16px; flex-wrap: wrap; position: relative;
+    }
+    .badge {
+      background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px; padding: 4px 14px;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .new-plan-btn {
+      position: relative; margin-top: 20px;
+      display: inline-block; padding: 8px 20px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 20px; cursor: pointer; color: white;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.83rem; font-weight: 600;
+      transition: background 0.15s;
+    }
+    .new-plan-btn:hover { background: rgba(255,255,255,0.3); }
+
+    /* Section nav */
+    .section-nav {
+      background: var(--white); border-bottom: 2px solid var(--warm);
+      display: flex; justify-content: center; gap: 0;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .nav-btn {
+      background: none; border: none; padding: 14px 24px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; font-weight: 600;
+      color: var(--muted); cursor: pointer;
+      border-bottom: 3px solid transparent; transition: all 0.2s;
+    }
+    .nav-btn:hover { color: var(--sage-dark); }
+    .nav-btn.active { color: var(--sage-dark); border-bottom-color: var(--sage); }
+
+    /* Sections */
+    .plan-section { display: none; }
+    .plan-section.active { display: block; }
+
+    /* Container */
+    .container { max-width: 960px; margin: 0 auto; padding: 28px 20px; }
+
+    /* Health note */
+    .health-note {
+      background: linear-gradient(135deg, #e8f4ea, #f0ece2);
+      border-left: 4px solid var(--sage); border-radius: 8px;
+      padding: 16px 20px; margin-bottom: 24px;
+      font-size: 0.88rem; color: var(--text); line-height: 1.7;
+    }
+    .health-note strong { color: var(--sage-dark); }
+
+    /* Week tabs */
+    .week-nav {
+      background: var(--white); border-bottom: 2px solid var(--warm);
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 8px;
+      padding: 14px 24px;
+    }
+    #week-tabs { display: contents; }
+    .week-tab {
+      background: var(--white); border: 2px solid var(--sage-light);
+      border-radius: 8px; padding: 8px 20px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.88rem; font-weight: 600;
+      color: var(--sage-dark); cursor: pointer; transition: all 0.18s;
+    }
+    .week-tab:hover, .week-tab.active { background: var(--sage); border-color: var(--sage); color: white; }
+
+    /* Week grids */
+    .week-grid { display: none; }
+    .week-grid.active { display: block; }
+
+    /* Day cards */
+    .day-card {
+      background: var(--white); border-radius: 12px; margin-bottom: 16px;
+      overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border: 1px solid var(--border-card);
+    }
+    .day-header {
+      background: linear-gradient(90deg, var(--sage-dark), var(--sage));
+      color: white; padding: 12px 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .day-num {
+      font-family: 'Playfair Display', serif; font-size: 1.6rem;
+      font-weight: 700; line-height: 1; min-width: 36px;
+    }
+    .day-name { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.9; }
+    .meals { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .meal { padding: 16px 18px; border-right: 1px solid var(--border-card); }
+    .meal:last-child { border-right: none; }
+    .meal-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 4px; }
+    .meal-name { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--sage-dark); margin-bottom: 5px; }
+    .meal-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .meal-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .tag { background: var(--accent-light); color: var(--accent); border-radius: 4px; padding: 2px 7px; font-size: 0.7rem; font-weight: 600; }
+    .tag.green { background: #e3f0e4; color: var(--sage-dark); }
+
+    /* Shopping list */
+    .budget-bar {
+      background: var(--white); border-radius: 12px; padding: 20px 24px;
+      margin-bottom: 24px; border: 1px solid var(--border-card);
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .budget-big { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--sage-dark); font-weight: 700; line-height: 1; }
+    .budget-lbl { font-size: 0.78rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .budget-note { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+    .shop-section { background: var(--white); border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--border-card); }
+    .shop-head {
+      background: var(--warm); padding: 12px 20px; font-weight: 600; font-size: 0.9rem;
+      color: var(--sage-dark); display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none;
+    }
+    .shop-items { padding: 6px 0; }
+    .shop-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 20px; border-bottom: 1px solid #f5f2eb;
+      transition: background 0.12s;
+    }
+    .shop-item:last-child { border-bottom: none; }
+    .shop-item:hover { background: #faf8f3; }
+    .shop-item input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--sage); cursor: pointer; flex-shrink: 0; }
+    .shop-item label { flex: 1; font-size: 0.88rem; cursor: pointer; }
+    .shop-item label.checked { text-decoration: line-through; color: var(--muted); }
+    .shop-price { font-size: 0.82rem; color: var(--accent); font-weight: 600; min-width: 52px; text-align: right; }
+    .total-row {
+      background: var(--sage-dark); color: white; padding: 16px 24px;
+      border-radius: 10px; display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px; font-weight: 600;
+    }
+    .total-row .amount { font-family: 'Playfair Display', serif; font-size: 1.5rem; }
+    #shop-actions {
+      display: flex; gap: 10px; margin-top: 14px;
+    }
+    .shop-action-btn {
+      flex: 1; padding: 10px 14px;
+      border-radius: 8px; border: 1px solid var(--border);
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.15s; font-family: inherit;
+    }
+    #shop-print { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #shop-print:hover { opacity: 0.88; }
+    #shop-email { background: var(--white); color: var(--sage-dark); border-color: var(--sage); }
+    #shop-email:hover { background: var(--sage); color: #fff; }
+
+    /* Email section */
+    .email-card {
+      background: var(--white); border-radius: 12px; padding: 28px;
+      border: 1px solid var(--border-card); max-width: 520px; margin: 0 auto;
+      text-align: center;
+    }
+    .email-icon { font-size: 2rem; margin-bottom: 12px; }
+    .email-card h3 { font-family: 'Playfair Display', serif; color: var(--sage-dark); font-size: 1.4rem; margin-bottom: 8px; }
+    .email-card p { font-size: 0.88rem; color: var(--muted); margin-bottom: 20px; }
+    .email-row { display: flex; gap: 10px; }
+    .email-input {
+      flex: 1; padding: 10px 14px; border: 2px solid var(--border); border-radius: 8px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.93rem;
+      color: var(--text); outline: none; transition: border-color 0.2s;
+    }
+    .email-input:focus { border-color: var(--sage); }
+    .email-btn {
+      padding: 10px 20px; background: var(--sage); border: none; border-radius: 8px;
+      color: white; font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap; transition: background 0.15s;
+    }
+    .email-btn:hover { background: var(--sage-dark); }
+    .email-success { color: var(--sage-dark); font-size: 0.88rem; font-weight: 600; margin-top: 10px; display: none; }
+    .email-note { font-size: 0.75rem; color: var(--muted); margin-top: 8px; font-style: italic; }
+
+    /* ─────────────────── RECIPE MODAL ─────────────────── */
+    #recipe-modal {
+      position: fixed; inset: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    #recipe-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.55);
+    }
+    #recipe-card {
+      position: relative; z-index: 1;
+      background: var(--white); border-radius: 16px;
+      padding: 32px; max-width: 560px; width: 100%;
+      max-height: 82vh; overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+    }
+    #recipe-close {
+      position: absolute; top: 14px; right: 14px;
+      background: none; border: 1px solid var(--border);
+      border-radius: 50%; width: 32px; height: 32px;
+      font-size: 1.25rem; line-height: 1; cursor: pointer;
+      color: var(--muted); display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    #recipe-close:hover { border-color: var(--accent); color: var(--accent); }
+    .recipe-type {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--accent); margin-bottom: 5px;
+    }
+    .recipe-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem; font-weight: 700; color: var(--sage-dark);
+      margin-bottom: 20px; padding-right: 24px;
+    }
+    .recipe-section-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--sage-dark); margin-bottom: 8px;
+    }
+    .recipe-ingredients { list-style: none; margin-bottom: 20px; }
+    .recipe-ingredients li {
+      padding: 6px 0; border-bottom: 1px solid #f5f0e8;
+      font-size: 0.9rem; color: var(--text);
+    }
+    .recipe-ingredients li:last-child { border-bottom: none; }
+    .recipe-steps { list-style: none; }
+    .recipe-steps li {
+      display: flex; gap: 12px; margin-bottom: 10px;
+      font-size: 0.9rem; color: var(--text); line-height: 1.55;
+    }
+    .recipe-steps li .step-num {
+      min-width: 24px; height: 24px; border-radius: 50%;
+      background: var(--sage); color: white;
+      font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .meal--clickable { cursor: pointer; transition: background 0.15s; }
+    .meal--clickable:hover { background: var(--cream); }
+    .recipe-hint {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--sage); margin-top: 7px;
+    }
+    #recipe-actions {
+      display: flex; gap: 10px; margin-top: 22px;
+      padding-top: 16px; border-top: 1px solid #f5f0e8;
+    }
+    .recipe-action-btn {
+      flex: 1; padding: 9px 14px;
+      border-radius: 8px; border: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.15s;
+    }
+    #recipe-print { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #recipe-print:hover { opacity: 0.88; }
+    #recipe-email-btn { background: var(--white); color: var(--sage-dark); border-color: var(--sage); }
+    #recipe-email-btn:hover { background: var(--sage); color: #fff; }
+    @media print {
+      /* Recipe print */
+      body.print-recipe > *:not(#recipe-modal) { display: none !important; }
+      body.print-recipe #recipe-modal {
+        position: static !important; display: block !important;
+        padding: 0 !important; background: none !important;
+      }
+      body.print-recipe #recipe-overlay { display: none !important; }
+      body.print-recipe #recipe-card {
+        position: static !important; box-shadow: none !important;
+        border-radius: 0 !important; max-height: none !important;
+        overflow: visible !important; max-width: 100% !important;
+        padding: 24px !important;
+      }
+      body.print-recipe #recipe-close,
+      body.print-recipe #recipe-actions { display: none !important; }
+      body.print-recipe .recipe-title { font-size: 1.3rem !important; }
+
+      /* Shopping list print */
+      @page { margin: 16mm 14mm 20mm; }
+      body.print-shopping > *:not(#results) { display: none !important; }
+      body.print-shopping #results { display: block !important; }
+      body.print-shopping .plan-header,
+      body.print-shopping .section-nav,
+      body.print-shopping #plan,
+      body.print-shopping #email-section,
+      body.print-shopping #shop-actions { display: none !important; }
+      body.print-shopping #shopping { display: block !important; }
+      body.print-shopping .container { padding: 0 !important; }
+      body.print-shopping .budget-bar {
+        box-shadow: none !important; border-radius: 4pt !important;
+        border: 1pt solid #ccc !important; padding: 8pt 10pt !important;
+        margin-bottom: 10pt !important; display: flex !important;
+      }
+      body.print-shopping .shop-section {
+        break-inside: avoid; page-break-inside: avoid;
+        box-shadow: none !important; border: 1pt solid #ddd !important;
+        border-radius: 4pt !important; margin-bottom: 6pt !important;
+      }
+      body.print-shopping .shop-head {
+        break-after: avoid; page-break-after: avoid;
+        cursor: default !important; padding: 6pt 10pt !important;
+      }
+      body.print-shopping .shop-item {
+        break-inside: avoid; page-break-inside: avoid;
+        padding: 4pt 10pt !important;
+      }
+      body.print-shopping .shop-items { display: block !important; }
+      body.print-shopping .total-row {
+        break-inside: avoid; page-break-inside: avoid;
+        margin-top: 6pt !important; padding: 8pt 10pt !important;
+        border-radius: 4pt !important;
+      }
+      body.print-shopping .disclaimer-print { margin-bottom: 24pt; }
+    }
+
+    /* ─────────────────── DISCLAIMER / PRINT FOOTER ─────────────────── */
+    .print-author-footer {
+      display: none;
+    }
+    @media print {
+      .print-author-footer {
+        display: block !important;
+        position: fixed;
+        bottom: 12pt;
+        left: 0;
+        font-size: 8pt;
+        color: #444;
+        line-height: 1.5;
+        font-family: sans-serif;
+      }
+      .print-author-footer a {
+        color: #444;
+        text-decoration: none;
+      }
+    }
+    .disclaimer-bar {
+      background: #f5f0e8;
+      border-top: 1px solid var(--border);
+      padding: 10px 24px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.55;
+      text-align: center;
+    }
+    .disclaimer-bar strong { color: var(--sage-dark); display: block; margin-bottom: 3px; font-size: 0.72rem; }
+    .disclaimer-print {
+      display: none;
+    }
+    @media print {
+      .disclaimer-print {
+        display: block !important;
+        margin-top: 24px;
+        padding-top: 12px;
+        border-top: 1px solid #999;
+        font-size: 7.5pt;
+        color: #555;
+        line-height: 1.5;
+      }
+      .disclaimer-print strong { display: block; font-size: 8pt; margin-bottom: 3px; }
+      .disclaimer-bar { display: none !important; }
+    }
+
+    /* Mobile */
+    @media (max-width: 680px) {
+      .step-card { padding: 24px 20px; }
+      .step-title { font-size: 1.4rem; }
+      .plan-header h1 { font-size: 1.8rem; }
+      .plan-header { padding: 36px 20px 28px; }
+      .meals { grid-template-columns: 1fr; }
+      .meal { border-right: none; border-bottom: 1px solid var(--border-card); }
+      .meal:last-child { border-bottom: none; }
+      .container { padding: 16px; }
+      .progress-labels { display: none; }
+      .nav-btn { padding: 12px 14px; font-size: 0.8rem; }
+      .radio-cards { grid-template-columns: 1fr 1fr; }
+      .date-row { grid-template-columns: 1fr; }
+      .check-grid { grid-template-columns: 1fr; }
+      .email-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ WIZARD ══════════════════ -->
+<div id="wizard">
+  <div class="wiz-brand">
+    <div class="wiz-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="wiz-brand-name">ParkinsonDiet</div>
+      <div class="wiz-brand-sub">Personalised Meal Planner</div>
+      <div class="wiz-brand-credit">Created by Aaron D. Cohen &middot; <a href="https://parkinsonslife.com" target="_blank" rel="noopener noreferrer" class="brand-link">parkinsonslife.com</a></div>
+    </div>
+  </div>
+
+  <div class="wiz-progress">
+    <div class="progress-labels" id="progress-labels"></div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="wiz-body">
+    <div class="step-card" id="step-card">
+      <!-- injected by JS -->
+    </div>
+  </div>
+
+  <div class="wiz-footer">
+    <button class="btn-back" id="btn-back">Back</button>
+    <button class="btn-next" id="btn-next">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════ LOADING ══════════════════ -->
+<div id="loading">
+  <div class="loading-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  </div>
+  <div class="loading-title" id="loading-title">Crafting your meal plan…</div>
+  <div class="loading-sub" id="loading-sub">Your personalised Parkinson's-friendly plan is being generated. This takes about 15–30 seconds.</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- ══════════════════ RESULTS ══════════════════ -->
+<div id="results">
+  <header class="plan-header">
+    <h1 id="r-title">Your Meal Plan</h1>
+    <p id="r-sub">Plant-Based · Parkinson's Friendly</p>
+    <div class="badges" id="r-badges"></div>
+    <button class="new-plan-btn" onclick="startOver()">← Build a new plan</button>
+  </header>
+
+  <nav class="section-nav">
+    <button class="nav-btn active" data-section="plan">Meal Plan</button>
+    <button class="nav-btn" data-section="shopping">Shopping List</button>
+    <button class="nav-btn" data-section="email-section">Send by Email</button>
+  </nav>
+
+  <!-- Meal Plan -->
+  <div id="plan" class="plan-section active">
+    <nav class="week-nav"><div id="week-tabs"></div></nav>
+    <div class="container">
+      <div class="health-note" id="r-health-note"></div>
+      <div id="week-grids"></div>
+    </div>
+  </div>
+
+  <!-- Shopping List -->
+  <div id="shopping" class="plan-section">
+    <div class="container">
+      <div class="budget-bar">
+        <div>
+          <div class="budget-big" id="r-budget-total">$100</div>
+          <div class="budget-lbl">Your Budget</div>
+        </div>
+        <div>
+          <div class="budget-big" id="r-est-total" style="color:var(--accent)">$—</div>
+          <div class="budget-lbl">Estimated Total</div>
+        </div>
+        <div class="budget-note">Prices are estimates based on typical US grocery store costs. Buying store brands and in-season produce will help stay under budget.</div>
+      </div>
+      <div id="budget-over-note" style="display:none;margin:12px 0;padding:10px 14px;background:rgba(255,200,0,0.12);border:1px solid rgba(255,200,0,0.4);border-radius:8px;font-size:0.85rem;color:var(--text)"></div>
+      <div id="shop-list-container"></div>
+      <div class="total-row">
+        <span>Estimated Total</span>
+        <span class="amount" id="r-grand-total">$—</span>
+      </div>
+      <div id="shop-actions">
+        <button class="shop-action-btn" id="shop-print">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print / Save PDF
+        </button>
+        <button class="shop-action-btn" id="shop-email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Shopping List
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div id="email-section" class="plan-section">
+    <div class="container">
+      <div class="email-card">
+        <div class="email-icon">📧</div>
+        <h3>Get your plan by email</h3>
+        <p>Click below to open your email client with the full meal plan and shopping list ready to send.</p>
+        <button class="email-btn" id="email-btn" style="margin:0 auto;display:block;padding:12px 32px">Open in Email</button>
+        <div class="email-success" id="email-success"></div>
+        <div class="email-note">Opens your default email client with the plan pre-filled.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recipe modal -->
+<div id="recipe-modal" style="display:none">
+  <div id="recipe-overlay"></div>
+  <div id="recipe-card">
+    <button id="recipe-close">&times;</button>
+    <div id="recipe-type" class="recipe-type"></div>
+    <div id="recipe-title" class="recipe-title"></div>
+    <div id="recipe-body"></div>
+    <div id="recipe-actions" style="display:none">
+      <button class="recipe-action-btn" id="recipe-print">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save PDF
+      </button>
+      <button class="recipe-action-btn" id="recipe-email-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email Recipe
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ DISCLAIMER ══════════════════ -->
+<div class="disclaimer-bar">
+  <strong>Medical Disclaimer</strong>
+  The information provided by ADCRiskHorizon's ParkinsonDiet application is for general informational purposes only. We are not licensed medical professionals, registered dietitians, or nutritionists, and nothing in this application constitutes medical or nutritional advice. Always consult your physician, neurologist, or qualified healthcare provider before making any dietary changes related to Parkinson's disease management. By using ParkinsonDiet, you agree that ADCRiskHorizon assumes no liability for any outcomes resulting from the use of this application.
+</div>
+
+<!-- Print-only author footer (fixed bottom-left on every printed page) -->
+<template id="print-author-template">
+  <div class="print-author-footer">
+    <div>Aaron D. Cohen</div>
+    <div><a href="https://parkinsonslife.com">parkinsonslife.com</a></div>
+  </div>
+</template>
+
+<!-- Print-only disclaimer (injected into printable areas via JS) -->
+<template id="disclaimer-template">
+  <div class="disclaimer-print">
+    <strong>Medical Disclaimer</strong>
+    The information provided by ADCRiskHorizon's ParkinsonDiet application is for general informational purposes only. We are not licensed medical professionals, registered dietitians, or nutritionists, and nothing in this application constitutes medical or nutritional advice. Always consult your physician, neurologist, or qualified healthcare provider before making any dietary changes related to Parkinson's disease management. By using ParkinsonDiet, you agree that ADCRiskHorizon assumes no liability for any outcomes resulting from the use of this application.
+  </div>
+</template>
+
+<script type="module" src="/src/meal-plan.ts"></script>
+</body>
+</html>

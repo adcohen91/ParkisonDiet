@@ -1,0 +1,1 @@
+I have  to spend on food the rest of the month. I need breakfast and dinner meals for the month that are nutricious, do not have meat or dairy. I am 61 with Parkinson's Dysautonomia. I can prepare anything with  various ingredients. Please create for every day a breakfast and dinner a recipes. Create a shopping list from the ingredients needed to prepare the meals.

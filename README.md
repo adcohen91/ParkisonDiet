@@ -1,38 +1,28 @@
 # ParkisonDiet
-This is the code repository for the Parkinson's Diet application.
+This is the overall description of the Parkinson's Diet Application
 
 Below is an example of a diet plan and grocery list for a person who has Parkinson's disease.
 An Exmaple Menu starts at # Example Menu
 1) Create an application that will be deployed on AWS
-2) Prompt the user for a start date and and date. Show them a calendar that they can select from. If they chose more than 31 days it will be too many days and the system will tell them to keep the selection to 31 days or less.
-3) Ask the user if they have any allergies and provide a list of common ingredients that a person might be allergic to, for example dairy, nuts.
-4) The user will select from this items which ones they are allergic to and should not be included in a recipe.
-5) Provide a list of meats to exclude from their diet, for example: fish, poultry, beef, pork, goat. Ask them if they are vegan.
-6) The user will indicate from the list what they do not eat if they are not vegan.
-7) Ask the user how much money they have to spend.
-8) Compile all this information and find recepies on the internet that satisfy all criteria
-9)  A recipe and the ingredients listed.
-10) Create a shopping list for all the items for the user.
-11) Ask for the users email.
-12) If they enter an email send them the information in a format similar what in the screen.
-13) All system information can be found in the .env file
-14) An example html file to serve as a final result is located in meal-plan.html file
-15) Additional build inforaation is contained in the file <!DOCTYPE.txt
-16) After the build is complete test each component
-17) Push the application to AWS
+2) Ask the user how old they are
+3) Prompt the user for a start date and and date. Show them a calendar that they can select from. If they chose more than 31 days it will be too many days and the system will tell them to keep the selection to 31 days or less.
+4) Ask the user if they have been diagnose with Parkinson Dysautonomia
+5) Ask the user if they have any allergies and provide a list of common ingredients that a person might be allergic to, for example dairy, nuts.
+6) The user will select from this items which ones they are allergic to and should not be included in a recipe.
+7) Provide a list of meats to exclude from their diet, for example: fish, poultry, beef, pork, goat. Ask them if they are vegan.
+8) The user will indicate from the list what they do not eat if they are not vegan.
+9) Ask the user how much money they have to spend.
+10) Compile all this information and find recepies on the internet that satisfy all criteria
+11)  A recipe and the ingredients listed.
+12) Create a shopping list for all the items for the user.
+13) Ask for the users email.
+14) If they enter an email send them the information in a format similar what in the screen.
+15) All system information can be found in the .env file
+16) An example html file to serve as a final result is located in meal-plan.html file
+17) Additional build inforaation is contained in the file <!DOCTYPE.txt
+18) After the build is complete test each component
+19) Push the application to AWS
 
-# Example Menu
-
-PARKINSON'S DYSAUTONOMIA
-Diet Specification
-Plant-Based Meal Plan  |  June 5 – 30, 2026
-Budget: $100  |  26 Days  |  Vegan  |  Dairy-Free  |  Meat-Free
-
-
-Prepared for personal use by individual with Parkinson's Dysautonomia, age 61
-Version 1.0  |  June 4, 2026
-
-Table of Contents
 
 
 
@@ -49,15 +39,8 @@ Whole food, minimally processed ingredients
 Budget ceiling: $100 total for the period June 5 to June 30, 2026
 
 1.2 Health Context
-Parkinson's Dysautonomia — Key Dietary Considerations
-Dysautonomia affects the autonomic nervous system, impacting blood pressure regulation, digestion, and temperature control. Dietary choices play a significant role in symptom management. Key priorities include: anti-inflammatory nutrition, support for dopamine precursors, gut motility promotion, blood pressure stability through meal timing and hydration, and avoidance of processed high-sodium foods.
+An example of the top part of the application is in the file ParkinsonDiet.html
 
-
-Orthostatic hypotension: eat smaller, more frequent meals; stay well hydrated
-Dopamine support: include lentils, peas, and fava beans (natural L-dopa precursors)
-Gut health: high fiber, fermented foods (miso), and consistent hydration
-Neuroinflammation: berries, flaxseed, walnuts, turmeric, ginger, and olive oil throughout
-Medication timing: high-protein meals may compete with levodopa absorption — consult your neurologist regarding meal and medication timing
 
 2. Daily Meal Plan — June 5 to June 30
 Each day includes a breakfast and dinner. All meals are plant-based, dairy-free, and meat-free. Nutritional focus areas are noted per meal type.
