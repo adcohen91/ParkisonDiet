@@ -3,13 +3,21 @@
 # Run from anywhere — finds the repo root automatically.
 set -euo pipefail
 
-REGION="us-east-1"
-ACCOUNT="968246765001"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Load REGION and ACCOUNT from .env
+REGION=$(grep -E '^AWS_REGION=' "$REPO_ROOT/.env" | head -1 | cut -d= -f2- | tr -d '"'"'" | xargs)
+ACCOUNT=$(grep -E '^AWS_ACCOUNT=' "$REPO_ROOT/.env" | head -1 | cut -d= -f2- | tr -d '"'"'" | xargs)
+
+if [ -z "$REGION" ] || [ -z "$ACCOUNT" ]; then
+  echo "ERROR: AWS_REGION and AWS_ACCOUNT must be set in .env" >&2
+  exit 1
+fi
+
 APP="parkinsondiet"
 ECR_REPO="${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/${APP}"
 ROLE_NAME="${APP}-apprunner-ecr-role"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # ── helpers ────────────────────────────────────────────────────────────────────
 load_env() {
