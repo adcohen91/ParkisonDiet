@@ -135,10 +135,12 @@ function renderCalendar(): string {
     cells += `<div class="${cls}" data-date="${iso}">${d}</div>`
   }
 
+  const isCurrentMonth = calYear === today.getFullYear() && calMonth === today.getMonth()
+
   return `
     <div class="calendar-wrap">
       <div class="cal-header">
-        <button class="cal-nav" id="cal-prev" type="button">‹</button>
+        <button class="cal-nav" id="cal-prev" type="button" ${isCurrentMonth ? 'disabled style="opacity:0.3;cursor:default;"' : ''}>‹</button>
         <span class="cal-month">${monthName}</span>
         <button class="cal-nav" id="cal-next" type="button">›</button>
       </div>
@@ -151,6 +153,8 @@ function renderCalendar(): string {
 
 function attachCalendarEvents(): void {
   document.getElementById('cal-prev')?.addEventListener('click', () => {
+    const now = new Date()
+    if (calYear === now.getFullYear() && calMonth === now.getMonth()) return
     calMonth--
     if (calMonth < 0) { calMonth = 11; calYear-- }
     refreshDateStep()
@@ -245,8 +249,12 @@ function renderStep1(): string {
 
 function renderStep2(): string {
   const today = new Date(); today.setHours(0, 0, 0, 0)
+  const todayIso = today.toISOString().slice(0, 10)
   calYear  = calYear  >= 0 ? calYear  : today.getFullYear()
   calMonth = calMonth >= 0 ? calMonth : today.getMonth()
+
+  // Default start date to today on first visit
+  if (!state.startDate) state.startDate = todayIso
 
   return `
     <div class="step-num">Step 2 of 6</div>
@@ -255,14 +263,14 @@ function renderStep2(): string {
     <div class="date-row">
       <div class="field">
         <label class="field-label" for="date-start">Start date</label>
-        <input class="field-input" type="date" id="date-start" value="${state.startDate}" />
+        <input class="field-input" type="date" id="date-start" value="${state.startDate}" min="${todayIso}" />
       </div>
       <div class="field">
         <label class="field-label" for="date-end">End date</label>
-        <input class="field-input" type="date" id="date-end" value="${state.endDate}" />
+        <input class="field-input" type="date" id="date-end" value="${state.endDate}" min="${todayIso}" />
       </div>
     </div>
-    <div class="range-summary" id="range-summary">Click a day to set your start date.</div>
+    <div class="range-summary" id="range-summary"></div>
     <div class="field-error" id="date-error" style="display:none;margin-top:8px;"></div>
     ${renderCalendar()}`
 }
@@ -384,13 +392,16 @@ function attachStepEvents(): void {
     const si = document.getElementById('date-start') as HTMLInputElement
     const ei = document.getElementById('date-end')   as HTMLInputElement
 
+    const todayIso = new Date().toISOString().slice(0, 10)
     si?.addEventListener('change', () => {
+      if (si.value < todayIso) { si.value = todayIso }
       state.startDate = si.value
       if (state.endDate && state.endDate < state.startDate) state.endDate = ''
       if (ei) ei.value = state.endDate
       updateRangeSummary(); refreshDateStep()
     })
     ei?.addEventListener('change', () => {
+      if (ei.value < todayIso) { ei.value = todayIso }
       if (!state.startDate) { state.startDate = ei.value; state.endDate = ''; if (si) si.value = state.startDate; return }
       if (ei.value < state.startDate) {
         state.endDate = state.startDate; state.startDate = ei.value
@@ -517,8 +528,26 @@ async function generatePlan(): Promise<void> {
   const n = Math.round(
     (new Date(state.endDate + 'T00:00:00').getTime() - new Date(state.startDate + 'T00:00:00').getTime()) / 86400000
   ) + 1
-  ;(document.getElementById('loading-sub') as HTMLElement).textContent =
-    `Generating ${n} days of personalised meals — this takes about 15–30 seconds.`
+
+  const estimate = n <= 7 ? '20–40 seconds' : n <= 14 ? '40–70 seconds' : '60–90 seconds'
+  const subEl = document.getElementById('loading-sub') as HTMLElement
+  subEl.textContent = `Generating ${n} days of personalised meals — this takes about ${estimate}.`
+
+  const statusMessages = [
+    'Selecting Parkinson\'s-friendly ingredients…',
+    'Planning breakfasts…',
+    'Building lunches and dinners…',
+    'Optimising for your budget…',
+    'Assembling the shopping list…',
+    'Checking nutritional balance…',
+    'Almost there — finalising your plan…',
+  ]
+  let msgIdx = 0
+  const titleEl = document.getElementById('loading-title') as HTMLElement
+  const statusInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % statusMessages.length
+    titleEl.textContent = statusMessages[msgIdx]
+  }, 6000)
 
   try {
     const res = await fetch('/api/generate-plan', {
@@ -536,6 +565,7 @@ async function generatePlan(): Promise<void> {
       }),
     })
 
+    clearInterval(statusInterval)
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
       throw new Error(body.detail || `Server error ${res.status}`)
@@ -543,8 +573,11 @@ async function generatePlan(): Promise<void> {
 
     const plan: PlanResp = await res.json()
     loadingEl.style.display = 'none'
+    titleEl.textContent = 'Crafting your meal plan…'
     renderResults(plan)
   } catch (err) {
+    clearInterval(statusInterval)
+    titleEl.textContent = 'Crafting your meal plan…'
     loadingEl.style.display = 'none'
     wizardEl.style.display  = 'flex'
     alert(`Could not generate plan: ${err instanceof Error ? err.message : err}\n\nCheck your API key in .env and try again.`)
@@ -691,7 +724,7 @@ function emailRecipe(): void {
     steps ? `\nPreparation:\n${steps}` : '',
     '',
     'Aaron D. Cohen',
-    'parkinsonslife.com',
+    'parkinsonlife.com',
     '',
     '— Sent from ParkinsonDiet',
     '',
@@ -758,7 +791,7 @@ function emailShoppingList(): void {
   lines.push(`Budget: $${budget.toFixed(0)}   Estimated Total: ~$${total.toFixed(0)}`)
   lines.push('')
   lines.push('Aaron D. Cohen')
-  lines.push('parkinsonslife.com')
+  lines.push('parkinsonlife.com')
   lines.push('')
   lines.push('— Sent from ParkinsonDiet')
   lines.push('')
@@ -957,7 +990,7 @@ function buildPlanEmailBody(plan: PlanResp): string {
   lines.push(`Estimated Total: ~$${plan.estimated_total.toFixed(0)}  |  Your Budget: $${plan.budget.toFixed(0)}`)
   lines.push('')
   lines.push('Aaron D. Cohen')
-  lines.push('parkinsonslife.com')
+  lines.push('parkinsonlife.com')
   lines.push('')
   lines.push('— Sent from ParkinsonDiet')
   lines.push('')
